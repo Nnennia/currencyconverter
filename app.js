@@ -1,12 +1,22 @@
 const express = require("express");
-const bodyParser = require("body-parser");
+//const bodyParser = require("body-parser");
 const fx = require("money");
 require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT;
 
-app.use(bodyParser.json());
+app.use(express.json());
+const BASE_CURRENCY = "USD";
+fx.base = BASE_CURRENCY;
 
+fetch(
+  `https://open.er-api.com/v6/latest/${fx.base}?app_id=${process.env.APP_ID}`
+)
+  .then((response) => response.json())
+  .then((data) => {
+    fx.rates = data.rates;
+  })
+  .catch((error) => console.error("Error fetching exchange rates:", error));
 // Define a route for currency conversion
 app.post("/convert", (req, res) => {
   try {
